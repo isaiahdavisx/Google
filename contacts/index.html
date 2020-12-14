@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<base target="_top">
+	<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+	<style>
+	html,
+	body {
+		height: 100%;
+	}
+
+	body,
+	.sidebar {
+		font-family: 'Gotham', Arial, sans-serif;
+		counter-reset: items;
+		width: 300px;
+		margin: 0 auto;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		font: 16px/24px arial, sans-serif, normal;
+		color: #000;
+	}
+
+	h4 {
+		color: #003d79;
+		-webkit-margin-before: 0;
+		-webkit-margin-after: 0;
+	}
+
+	a {
+		font-size: smaller;
+		display: block;
+	}
+
+	small {
+		word-wrap: break-word;
+	}
+
+	ul {
+		font-size: 0.75em;
+		display: block;
+		list-style-type: none;
+		-webkit-margin-before: 0;
+		-webkit-margin-after: 0;
+		-webkit-margin-start: 0;
+		-webkit-margin-end: 0;
+		-webkit-padding-start: 0;
+	}
+
+	.list-left>li {
+		display: inline-block;
+	}
+	/* Forms & Labels */
+
+	label {
+		display: block;
+		font-size: x-small;
+		font-weight: 500;
+	}
+
+	input[type='text'] {
+		margin-bottom: 10px;
+		width: 100%;
+	}
+
+	input:checked~.tab-content {
+		/*max-height: 10em;*/
+	}
+	/* Layout */
+
+	.col-4 {
+		float: left;
+		width: 25%;
+	}
+
+	.col-2 {
+		float: left;
+		width: 50%;
+	}
+
+	.col-3 {
+		float: left;
+		width: 33.3333%;
+	}
+
+	.col-6 {
+		float: left;
+		width: 66.6666%;
+	}
+
+	.left {
+		float: left;
+	}
+
+	.clear {
+		clear: both;
+	}
+
+	.docs-icon-grid {
+		top: -2648px;
+		left: 0;
+	}
+	/* Let's get this party started */
+
+	::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	/* Track */
+
+	::-webkit-scrollbar-track {
+		-webkit-border-radius: 10px;
+		border-radius: 10px;
+		background: #eee;
+		/*-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);*/
+	}
+	/* Handle */
+
+	::-webkit-scrollbar-thumb {
+		-webkit-border-radius: 10px;
+		border-radius: 10px;
+		background: #777;
+		/*-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .5);*/
+	}
+
+	::-webkit-scrollbar-thumb:window-inactive {
+		background: #aaa;
+		width: 6px;
+		height: 6px;
+	}
+	/* Animation */
+	/* Modals (*/
+
+	.hide {
+		display: none;
+	}
+	/* Loader */
+
+	#overlay {
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		position: fixed;
+		background: rgba(255,255,255,.9);
+		z-index: 1;
+		display: none;
+	}
+
+	#loader-outer {
+		position: fixed;
+		width: 34px;
+		height: 34px;
+		top: calc(50% - (34px / 2));
+		left: calc(50% - (34px / 2));
+		border-radius: 50%;
+		border: 2px solid red;
+	}
+
+	#loader-inner {
+		position: fixed;
+		width: 30px;
+		height: 30px;
+		top: calc(50% - (30px / 2));
+		left: calc(50% - (30px / 2));
+		border: 2px solid transparent;
+		border-radius: 50%;
+	}
+
+	/* Animation */
+
+	</style>
+	<!-- build:cssInline -->
+	<style>#display {
+	padding: 25px 0;
+}
+
+/* Info */
+
+span#user {
+	color: #003d79;
+}</style>
+	<!-- endbuild -->
+
+
+	<!-- build:headscript -->
+	<!-- endbuild -->
+
+
+	<script>
+	console.clear();
+	// helper fn
+	if ( google ) {
+
+		function focus() {
+			google.script.host.editor.focus();
+		}
+
+		function close() {
+			google.script.host.close();
+		}
+
+		function resizeDialog( width, height ) {
+			if ( arguments.length !== 2 ) { return; }
+			google.script.host.setWidth( width );
+			google.script.host.setHeight( height );
+		}
+
+		function GScript( server, client ) {
+			if ( typeof server !== "string" ) { return; }
+			try {
+				google.script.run.withSuccessHandler( client )[ server ]();
+			} catch ( err ) {
+				google.script.run.withFailureHandler( function() {
+					console.log( "%c " + err, 'background: red; color: white; display: block;' );
+				} )[ server ]();
+			}
+		}
+	}
+	// Prevent forms from submitting.
+	function preventFormSubmit() {
+		var forms = document.querySelectorAll( 'form' );
+		for ( var i = 0; i < forms.length; i++ ) {
+			forms[ i ].addEventListener( 'submit', function( event ) {
+				event.preventDefault();
+			} );
+		}
+	}
+	window.addEventListener( 'load', preventFormSubmit );
+	</script>
+</head>
+
+<body>
+	<div id="overlay">
+		<div id="loader-outer">
+			<div id="loader-inner"></div>
+		</div>
+		<div style="width:50px;height:50px;border-radius:100% 0 0 0;background: red;"></div>
+	</div>
+	<!-- build:index -->
+	<main>
+	<div id="controls">
+		<input type="button" name="prev" value="previous">
+		<input type="button" name="next" value="next">
+		<input type="text" name="search" placeholder="search">
+	</div>
+	<section class="sidebar">
+		<form onsubmit="">
+			<!-- Display -->
+			<div id="display">
+				<div id="info">
+					<h1>Paths</h1>
+					<div id="drive">
+
+						<div class="userObject">
+							<label>Drive</label>
+							<img class="left" src="https://cdn3.iconfinder.com/data/icons/geosm-e-commerce/48/search-32.png" alt="" style="width: 32px; height: 32px;">
+							<p class="left">/1_Employee/<span id="userDir">User</p>
+							<div class="clear"></div>
+						</div>
+						<div class="userObject">
+							<label>Contacts</label>
+							<img class="left" src="https://cdn3.iconfinder.com/data/icons/geosm-e-commerce/48/search-32.png" alt="" style="width: 32px; height: 32px;">
+							<p class="left">/Employee/<span id="userDir">User</p>
+							<div class="clear"></div>
+						</div>
+					</div>
+				</div>
+				<label for="">Full Name</label>
+				<input name="fullname" disabled="true" type="text">
+			</div>
+			<!-- User Objects -->
+			<div id="user">
+				<!-- match name attributes with class method (server-side) -->
+				<!-- for accessiblity when requesting certain data from the server -->
+				<label for="">First Name</label>
+				<input name="fname" type="text">
+				<label for="">Middle Name</label>
+				<input name="minital" type="text">
+				<label for="">Last Name</label>
+				<input name="lname" type="text">
+				<label for="">Title</label>
+				<input name="title" type="text">
+				<label for="">Email</label>
+				<input name="email" type="text">
+				<div id="division">
+					<label for="">Division</label>
+					<div class="col-3">
+						<select name="" id="">
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+						</select>
+					</div>
+					<div class="col-6">
+						<input name="division" type="text">
+					</div>
+					<div class="clear"></div>
+				</div>
+				<input type="text">
+				<div class="col-3">
+					<label for="">(Area)</label>
+					<input name="m_area" type="text">
+				</div>
+				<div class="col-3">
+					<label for="">Prefix</label>
+					<input name="m_prefix" type="text">
+				</div>
+				<div class="col-3">
+					<label for="">Line</label>
+					<input name="m_line" type="text">
+				</div>
+				<div class="clear"></div>
+				<input type="submit">
+				<input type="reset">
+			</div>
+		</form>
+		<!-- Employee next get -->
+		<a id="downloadAnchorElem" style="display:none"></a>
+	</section>
+</main>
+	<!-- endbuild -->
+
+	<!-- build:js -->
+	<script type='text/javascript'>// iteraate through each row
+// construct a new employee class for ease of look up
+// set callback success function in parameter
+// Group Name, User Name
+// Create, Read, Delete, Update certain data or entire contact
+// collecting individual employee data and packaging it for multiple uses across google platform
+// ajax(serverfn:string, callbackfn: function || obj.success, obj.fail )
+// check without undefined
+
+'use strict';
+// console.clear();
+// ( () => {
+var contact = {}; // keys
+var contacts = []; // iterable array
+var formInputs = document.querySelectorAll( 'form input' ); // DO NOT USE IN PRODUCTION
+var formObj = {}; // DO NOT USE IN PRODUCTION
+
+
+// development array
+var c;
+
+
+// constructor class for Employee's
+// 
+// Attach to UI elements
+
+function Employee( obj ) {
+	// check that this is an obj
+	this._init = function() {
+		// recursive check if this data can be used else where??
+		for ( var key in obj ) {
+			this[ key ] = obj[ key ];
+		}
+	}
+	this._init();
+};
+
+function UI( el ) {
+	// check if el is an array object
+	// check all components and dependencies if not found resolve by creating
+	this.el = el;
+	this.coord = [ 0, 0, 0 ];
+	this.steps = 1;
+	// dynamically check if this element exists and what controls are avaliable
+	this.controls = document.getElementById( 'controls' );
+	this.sort = function( obj ) {
+		this.el.sort( function( a, b ) {
+			return ( a[ "names" ].fullname > b[ "names" ].fullname ) ? 1 : ( ( b[ "names" ].fullname > a[ "names" ].fullname ) ? -1 : 0 );
+		} );
+	}
+	this.move = function() {
+		if ( this.name === "next" ) {
+			this.coord[ 2 ]++
+		} else {
+			this.coord[ 2 ]--;
+		}
+		console.log( this.coord[ 2 ] );
+		// if ( ( this.coord[ 2 ] - 1 ) >= this.coord[ 0 ] && ( this.coord[ 2 ] + 1 ) <= this.coord[ 1 ] ) {
+		// this.coord[ 2 ] = this.coord[ 2 ];
+		// }
+		console.log( this.name );
+	}
+	this.search = function( e ) {}
+	this.addBtn = function() {
+		document.querySelector( '.sidebar form' )
+			.appendChild( document.createElement( 'input' )
+				.setAttribute( 'name', 'whatever' ) );
+	}
+    this.submit = document.querySelector('form');
+	this.bindEvents = function() {
+		// this.move = this.move.bind( this, this.move );
+	}
+    this.setContactData = function(formData){
+        console.log(formData);
+        //google.script.run.withSuccessHandler( client )[ server ]();
+    }
+	this.events = function() {
+		// if (this.controls.children.length >= 2 ) { create && rerun method }
+		this.controls.children[ 0 ].addEventListener( 'click', this.move );
+		this.controls.children[ 1 ].addEventListener( 'click', this.move );
+		this.controls.children[ 2 ].addEventListener( 'keyup', this.search.bind( this ) );
+        this.submit.addEventListener( 'submit', this.setContactData );
+	}
+	this.update = function( i ) {
+		var query;
+		// query = "form input[name='" + key + "']";
+		// use recursion to get nested data
+	}
+	this.request = function() {
+		google.script.run();
+	}
+	this.init = function() {
+		this.sort();
+		this.bindEvents();
+		this.events();
+	}
+	this.init();
+};
+
+
+if ( GScript ) {
+	// live
+	GScript( "getContacts", function( e ) {
+		for ( var i = 0; i < e.length; i++ ) {
+			contact[ e[ i ] ] = new Employee( e[ i ] );
+			contacts[ i ] = contact[ e[ i ] ];
+		}
+		console.log( contacts );
+		var detectControls = new UI( contacts );
+	} );
+} else {
+	// development
+	contacts = [ {
+		"names": {
+			fname: "Zoey",
+			fullname: "Zoey Chanel",
+			lname: "Chanel",
+			prefix: "",
+			mname: "",
+			suffix: ""
+		},
+		"work": "zoey.chanel@pdbgroup.com",
+		"title": "Vice President",
+		"division": 2,
+		"ext": 122,
+		"mobile": [ "222", "222", "2222", "222" ],
+		"drive": {
+			"url": "https://drive.google.com/drive/folders/0B3g-MIF3jJwgcVBNS3BSYno2SkU"
+		}
+	}, {
+		"names": {
+			fname: "Adam",
+			fullname: "Adam West",
+			lname: "West",
+			mname: "",
+			prefix: "",
+			suffix: ""
+		},
+		"work": "adam.west@pdbgroup.com",
+		"title": "Batman",
+		"division": 1,
+		"ext": 123,
+		"mobile": [ "847", "894", "4883", "189" ],
+		"drive": {
+			"url": "https://drive.google.com/drive/folders/0B3g-MIF3jJwgcVBNS3BSYno2SkU"
+		}
+	} ]
+	for ( var i = 0; i < contacts.length; i++ ) {
+		contact[ contacts[ i ] ] = new Employee( contacts[ i ] );
+		contacts[ i ] = contact[ contacts[ i ] ];
+	}
+	console.log( contacts );
+	var detectControls = new UI( contacts );
+}
+
+
+// } )();</script>
+	<!-- endbuild -->
+
+</body>
+
+</html>

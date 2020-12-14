@@ -1,0 +1,46 @@
+function Rangeintersect( a, b ) {
+	log( a );
+	log( b );
+	// 
+	var s, rs, ixa, ixb, ra, rb;
+	var r1a, r1b, rla, rlb;
+	var c1a, c1b, cla, clb;
+	// 
+	s = getActiveSheet( );
+	rs = s.getNamedRanges( );
+	// 
+	arguments.forEach( function ( el, index ) {
+		log( el )
+	} )
+	ixa = rs.map( function ( x ) { return x.getName( ); } ).indexOf( a );
+	ixb = rs.map( function ( x ) { return x.getName( ); } ).indexOf( b );
+	ra = rs[ ixa ].getRange( );
+	rb = rs[ ixb ].getRange( );
+	// 
+	r1a = ra.getRow( );
+	rla = ra.getLastRow( );
+	r1b = rb.getRow( );
+	rlb = rb.getLastRow( )
+	// 
+	c1a = ra.getColumn( );
+	cla = ra.getLastColumn( );
+	c1b = rb.getColumn( );
+	clb = rb.getLastColumn( );
+	// 
+	return s.getRange( Math.max( r1a, r1b ), Math.max( c1a, c1b ), Math.min( rla, rlb ) - Math.max( r1a, r1b ) + 1, Math.min( cla, clb ) - Math.max( c1a, c1b ) + 1 ).getA1Notation( );
+}
+
+function RANGEINTERSECT( a, b ) {
+	// Passes array of data
+	var ai = 0,
+		bi = 0;
+	var result = [ ];
+	while ( ai < a.length && bi < b.length ) {
+		if ( a[ ai ] < b[ bi ] ) { ai++; } else if ( a[ ai ] > b[ bi ] ) { bi++; } else /* they're equal */ {
+			result.push( a[ ai ] );
+			ai++;
+			bi++;
+		}
+	}
+	return result;;
+}
