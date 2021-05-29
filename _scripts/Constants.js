@@ -1,0 +1,2 @@
+var data = {};
+var HEADERS = {};
