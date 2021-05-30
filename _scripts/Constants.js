@@ -1,2 +1,0 @@
-var data = {};
-var HEADERS = {};

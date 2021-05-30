@@ -1,38 +1,36 @@
-
 // GLOBALS
-// VARIABLES - EDIT
-data["dest_sht_url"] = "https://docs.google.com/spreadsheets/d/1J4XDBE7P5heX_yfwj8S5C3UA2wTLpYhH5KiT9kB9B9k/edit#gid=0";
-data["dest_wks_nme"] = "Files";
-data["src_fldr_id"] = "0B52bqtgAdxV8dWRBRnkzWTNSaWM"; // 3_Clients
-data["src_prjct_id"] = "12ffva409KlkLHucIpjRRL8Z9PpI8rl6I1vIjD7LrmX2PZIob-Aoo3JbH"; //Global App Script
-// CONSTANTS - DO NOT EDIT
-HEADERS["Sheet Name"] = 0
-HEADERS["Sheet ID"] = 1
-HEADERS["Script ID"] = 2
-HEADERS["Last Update"] = 3
-HEADERS["Error"] = 4
-var HEADERSMimic = ["Sheet Name", "Sheet ID", "Script ID", "Last Update", "Error"];
-// SUPPORT
-function log(fn, obj) {
-  var fnName = fn.name;
-  Logger.log({fnName: obj});
+var data = {
+  "dest_sht_url": "https://docs.google.com/spreadsheets/d/1J4XDBE7P5heX_yfwj8S5C3UA2wTLpYhH5KiT9kB9B9k/edit#gid=0",
+  "dest_wks_nme": "Files",
+  "src_fldr_id": "0B52bqtgAdxV8dWRBRnkzWTNSaWM",
+  "src_prjct_id": "12ffva409KlkLHucIpjRRL8Z9PpI8rl6I1vIjD7LrmX2PZIob-Aoo3JbH"
 }
 
-function isValidDate(d) {
-  return d instanceof Date && !isNaN(d);
+// CONSTANTS - DO NOT EDIT
+var HEADERS = {
+  "Sheet Name":  0,
+  "Sheet ID":  1,
+  "Script ID":  2,
+  "Last Update":  3,
+  "Error":  4
 }
-function getAccessToken (){
-    var accessToken = ScriptApp.getOAuthToken();
-    log({"accessToken": accessToken});
-    return accessToken;
+// SUPPORT
+function getAccessToken() {
+  var accessToken = ScriptApp.getOAuthToken();
+  Logger.log({ "accessToken": accessToken });
+  return accessToken;
 }
 function getscriptID() {
   var scriptID = ScriptApp.getScriptId();
-  Logger.log({"scriptID": scriptID});
+  Logger.log({ "scriptID": scriptID });
   return scriptID;
 }
 function getSheetByName() {
   return SpreadsheetApp.openByUrl(data.dest_sht_url).getSheetByName(data.dest_wks_nme);
+}
+function getRange(sheet, arr){
+  /* https://developers.google.com/apps-script/reference/spreadsheet/sheet#getrangerow,-column,-numrows,-numcolumns */
+  return sheet.getRange(...arr);
 }
 function setValues(vals) {
   getSheetByName().getRange(1, 1, vals.length, vals[0].length).setValues(vals);
@@ -45,7 +43,6 @@ function getFilesByFolder() {
   list.push(Object.keys(HEADERS));
   // var files = folder.getFiles();
   var files = folder.getFilesByType(MimeType.GOOGLE_SHEETS);
-  // var filePrefix = "Products";
   if (!files.hasNext()) { return; }
   Logger.log(files);
   while (files.hasNext()) {
@@ -58,6 +55,18 @@ function getFilesByFolder() {
   Logger.log(list);
   return list;
 }
+function isValidDate(d) {
+  return d instanceof Date && !isNaN(d);
+}
+function getLastUpdate(datetime) {
+  // Get the last update
+  //   If empty or invalid, set to an arbitrary historical date
+  if (datetime === "" || !isValidDate(datetime)) {
+    datetime = new Date("Jan 1, 1970");
+  }
+  return datetime;
+}
+
 function createOrUpdateScripts() {
   var start = new Date(); // When the function started processing
   var sh = SpreadsheetApp.openByUrl(data.dest_sht_url).getSheetByName(data.dest_wks_nme);
@@ -76,12 +85,7 @@ function createOrUpdateScripts() {
       continue;
     }
 
-    // Get the last update
-    //   If empty or invalid, set to an arbitrary historical date
-    var last_update = values[i][HEADERS["Last Update"]];
-    if (last_update === "" || !isValidDate(last_update)) {
-      last_update = new Date("Jan 1, 1970");
-    }
+    var last_update = getLastUpdate(values[i][HEADERS["Last Update"]]);
 
     // Was there an error?
     var error_on_last = values[i][HEADERS["Error"]] ?
@@ -106,6 +110,7 @@ function createOrUpdateScripts() {
 
           // Set script ID, timestamp of last update and clear errors 
           var lastRun = [dst_script_id, timestamp, ""];
+          
           sh.getRange(i + 1, 2, 1, 3).setValues([lastRun]);
         }
         else {
