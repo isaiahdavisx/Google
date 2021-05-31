@@ -2,3 +2,4 @@ logs.txt
 creds.json
 .clasprc.json
 .clasp.json
+*.code-workspace

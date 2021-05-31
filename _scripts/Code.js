@@ -1,10 +1,8 @@
 // GLOBALS
-var data = {
-  "dest_sht_url": "https://docs.google.com/spreadsheets/d/1J4XDBE7P5heX_yfwj8S5C3UA2wTLpYhH5KiT9kB9B9k/edit#gid=0",
-  "dest_wks_nme": "Files",
-  "src_fldr_id": "0B52bqtgAdxV8dWRBRnkzWTNSaWM",
-  "src_prjct_id": "12ffva409KlkLHucIpjRRL8Z9PpI8rl6I1vIjD7LrmX2PZIob-Aoo3JbH"
-}
+var destSheetURL = "https://docs.google.com/spreadsheets/d/1J4XDBE7P5heX_yfwj8S5C3UA2wTLpYhH5KiT9kB9B9k/edit#gid=0";
+var destWorksheetName = "Files";
+var srcFolderId = "0B52bqtgAdxV8dWRBRnkzWTNSaWM";
+var srcProjectId = "12ffva409KlkLHucIpjRRL8Z9PpI8rl6I1vIjD7LrmX2PZIob-Aoo3JbH";
 
 // CONSTANTS - DO NOT EDIT
 var HEADERS = {
@@ -26,7 +24,7 @@ function getscriptID() {
   return scriptID;
 }
 function getSheetByName() {
-  return SpreadsheetApp.openByUrl(data.dest_sht_url).getSheetByName(data.dest_wks_nme);
+  return SpreadsheetApp.openByUrl(destSheetURL).getSheetByName(destWorksheetName);
 }
 function getRange(sheet, arr){
   /* https://developers.google.com/apps-script/reference/spreadsheet/sheet#getrangerow,-column,-numrows,-numcolumns */
@@ -37,8 +35,8 @@ function setValues(vals) {
 }
 function getFilesByFolder() {
   // support
-  var folder = DriveApp.getFolderById(data.src_fldr_id);
   // core
+  var folder = DriveApp.getFolderById(srcFolderId);
   var list = [];
   list.push(Object.keys(HEADERS));
   // var files = folder.getFiles();
@@ -69,17 +67,16 @@ function getLastUpdate(datetime) {
 
 function createOrUpdateScripts() {
   var start = new Date(); // When the function started processing
-  var sh = SpreadsheetApp.openByUrl(data.dest_sht_url).getSheetByName(data.dest_wks_nme);
+  var sh = SpreadsheetApp.openByUrl(destSheetURL).getSheetByName(destWorksheetName);
   var values = sh.getDataRange().getValues();
+  var headStart = HEADERS["Script ID"] + 1;
 
   // Create date one week ago
   var one_week = new Date();
   one_week.setDate(one_week.getDate() - 7);
 
-  for (var i = 1; i < values.length; i++) { // 0-based array, start at 1 to skip headers
-    Logger.log(values[i])
-    // Check if the Sheet ID field is empty and skip row if true
-    var empty_file_id = values[i][HEADERS["Sheet ID"]] == "" ? true : false;
+  for (var i = 1; i < values.length; i++) {
+    var empty_file_id = values[i][HEADERS["Sheet ID"]] === "" ? true : false;
     if (empty_file_id) {
       Logger.log("Skipped row: " + i);
       continue;
@@ -106,21 +103,21 @@ function createOrUpdateScripts() {
         // Create the script project
         var dst_prjct_id = values[i][HEADERS["Script ID"]];
         if (dst_prjct_id === "") {
-          var dst_script_id = copySourceToDestination(data.src_prjct_id, dst_prjct_id);
+          var dst_script_id = copySourceToDestination(srcProjectId, dst_prjct_id);
 
           // Set script ID, timestamp of last update and clear errors 
           var lastRun = [dst_script_id, timestamp, ""];
-          
-          sh.getRange(i + 1, 2, 1, 3).setValues([lastRun]);
+          // Create class that records defaults and row
+          sh.getRange(i + 1, headStart, 1, 3).setValues([lastRun]);
         }
         else {
           // Update the Script Project
           var upd_script_id = values[i][HEADERS["Script ID"]];
-          var dst_script_id = updateDestinationWithSource(data.src_prjct_id, upd_script_id);
+          var dst_script_id = updateDestinationWithSource(srcProjectId, upd_script_id);
 
           // Set script ID, timestamp of last update and clear errors
           var lastRun = [dst_script_id, timestamp, ""];
-          sh.getRange(i + 1, 2, 1, 3).setValues([lastRun]);
+          sh.getRange(i + 1, headStart, 1, 3).setValues([lastRun]);
         }
       }
       catch (err) {
@@ -128,6 +125,10 @@ function createOrUpdateScripts() {
       }
     }
   }
+}
+
+function fetch ( options ){
+  var baseUrl = "https://script.googleapis.com/v1/projects";
 }
 
 function copySourceToDestination(srcProjectId, destFileId) {
@@ -146,6 +147,7 @@ function copySourceToDestination(srcProjectId, destFileId) {
     method: "get",
     headers: { "Authorization": "Bearer " + accessToken }
   }).getContentText();
+  
 
   // Create new bound script and retrieve project ID.
   var dstId = JSON.parse(UrlFetchApp.fetch(baseUrl, {
@@ -154,7 +156,7 @@ function copySourceToDestination(srcProjectId, destFileId) {
     headers: { "Authorization": "Bearer " + accessToken },
     payload: JSON.stringify({ "title": srcName, "parentId": destFileId })
   }).getContentText()).scriptId;
-
+  
   // Upload a project to bound-script project.
   var res = JSON.parse(UrlFetchApp.fetch(baseUrl + "/" + dstId + "/content", {
     method: "put",
@@ -163,7 +165,6 @@ function copySourceToDestination(srcProjectId, destFileId) {
     payload: obj
   }).getContentText());
 
-  Logger.log(dstId);
   return dstId;
 }
 

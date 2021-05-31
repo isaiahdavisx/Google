@@ -9,3 +9,10 @@
 ## [Clasp](https://github.com/google/clasp)
 ### Reference
 [Clasp Run](https://github.com/google/clasp/blob/master/docs/run.md#run)
+clasp login --creds creds.json
+https://console.cloud.google.com/apis/credentials?project=id-portfolios
+https://script.google.com/home/projects/12ffva409KlkLHucIpjRRL8Z9PpI8rl6I1vIjD7LrmX2PZIob-Aoo3JbH/edit
+https://developers.google.com/apps-script/api/reference/rest/v1/scripts/run#response-body
+
+## Managing Multiple Google App Scripts
+https://jcconnell.com/managing-multiple-script-projects-using-the-google-apps-script-api/#alternatives
