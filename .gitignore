@@ -3,3 +3,4 @@ creds.json
 .clasprc.json
 .clasp.json
 *.code-workspace
+node_modules
