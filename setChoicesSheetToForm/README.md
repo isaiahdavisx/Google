@@ -1,1 +1,0 @@
-This script populates multiple choice dropdowns in Google Forms to linked Sheet.
