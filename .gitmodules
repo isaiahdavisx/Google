@@ -1,0 +1,3 @@
+[submodule "devtools-notes"]
+	path = devtools-notes
+	url = https://github.com/Tpessia/devtools-notes.git
