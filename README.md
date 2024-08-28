@@ -3,9 +3,9 @@
 A project to learn and expand Chrome tools.
 
 - [Description](#description)
-- [Projects](#projects)
+  - [Projects](#projects)
 
-# Projects
+## Projects
 
 Chrome Dev Tools Extensions
 
